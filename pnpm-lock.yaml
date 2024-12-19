@@ -18,7 +18,7 @@ importers:
         specifier: 5.5.4
         version: 5.5.4
 
-  apps/docs:
+  apps/web-app-one:
     dependencies:
       '@repo/ui':
         specifier: workspace:*
@@ -52,7 +52,7 @@ importers:
         specifier: 5.5.4
         version: 5.5.4
 
-  apps/web:
+  apps/web-app-two:
     dependencies:
       '@repo/ui':
         specifier: workspace:*
