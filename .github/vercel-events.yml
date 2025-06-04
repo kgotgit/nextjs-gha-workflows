@@ -1,0 +1,46 @@
+name: Vercel Repository Dispatch Events
+on:
+  deployment_status:
+    types:
+      - 'success'
+      - 'error'
+      - 'canceled'
+      - 'ignored'
+      - 'skipped'
+      - 'pending'
+      - 'failed'
+      - 'promoted'
+  repository_dispatch:
+    types:
+      - 'vercel.deployment.success'
+      - 'vercel.deployment.error'
+      - 'vercel.deployment.canceled'
+      - 'vercel.deployment.ignored'
+      - 'vercel.deployment.skipped'
+      - 'vercel.deployment.pending'
+      - 'vercel.deployment.failed'
+      - 'vercel.deployment.promoted'
+jobs:
+  repositoryDispatchEvent:
+    if: github.event_name == 'repository_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+     
+      - name: Log Github event payload
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Action: ${{ github.event.action }}"
+          echo "Client Payload: ${{ toJson(github.event.client_payload) }}"
+  deploymentStatusEvent:
+    if: github.event_name == 'deployment_status'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log Github event payload
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Deployment ID: ${{ github.event.deployment.id }}"
+          echo "State: ${{ github.event.deployment_status.state }}"
+          echo "Description: ${{ github.event.deployment_status.description }}"
+          echo "Environment: ${{ github.event.deployment.environment }}"
+          echo "Target URL: ${{ github.event.deployment_status.target_url }}"
+     
