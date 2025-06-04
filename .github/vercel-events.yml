@@ -1,5 +1,4 @@
 name: Vercel Repository Dispatch Events
-
 on:
   repository_dispatch:
     types:
