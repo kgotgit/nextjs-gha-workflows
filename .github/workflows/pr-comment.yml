@@ -1,0 +1,76 @@
+name: PR Comment Handler
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  handle-comment:
+    # Only run on PR comments, not issue comments
+    if: github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+      
+      - name: Get comment details
+        id: comment
+        run: |
+          echo "author=${{ github.event.comment.user.login }}" >> $GITHUB_OUTPUT
+          echo "body=${{ github.event.comment.body }}" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+      
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+      
+      - name: Handle comment command
+        run: |
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          echo "Comment from ${{ steps.comment.outputs.author }}: $COMMENT_BODY"
+          
+          # Example: Check for specific commands
+          if [[ "$COMMENT_BODY" == "/deploy"* ]]; then
+            echo "Deploy command detected"
+            # Add your deployment logic here
+          elif [[ "$COMMENT_BODY" == "/test"* ]]; then
+            echo "Test command detected"
+            # Add your test logic here
+          elif [[ "$COMMENT_BODY" == "/build"* ]]; then
+            echo "Build command detected"
+            # Add your build logic here
+          else
+            echo "No specific command detected"
+          fi
+      
+      - name: Post response comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentBody = context.payload.comment.body;
+            let response = `👋 @${{ github.event.comment.user.login }}, I received your comment!`;
+            
+            if (commentBody.startsWith('/deploy')) {
+              response = '🚀 Deployment process initiated...';
+            } else if (commentBody.startsWith('/test')) {
+              response = '🧪 Running tests...';
+            } else if (commentBody.startsWith('/build')) {
+              response = '🔨 Build process started...';
+            }
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: response
+            });
