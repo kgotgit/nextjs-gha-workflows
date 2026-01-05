@@ -32,7 +32,7 @@ jobs:
           echo "Action: ${{ github.event.action }}"
           echo "Client Payload: ${{ toJson(github.event.client_payload) }}"
       - name: Create commit status for successful deployment
-        if: github.event.deployment_status.state == 'success'
+        if: github.event.client_payload.state.type == 'success'
         uses: actions/github-script@v7
         with:
           script: |
@@ -53,7 +53,7 @@ jobs:
             console.log(`✅ Created success commit status for SHA ${sha}`);
       
       - name: Create commit status for failed deployment
-        if: github.event.deployment_status.state == 'failure' || github.event.deployment_status.state == 'error'
+        if: github.event.client_payload.state.type == 'failure' || github.event.client_payload.state.type == 'error'
         uses: actions/github-script@v7
         with:
           script: |
