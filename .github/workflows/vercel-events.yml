@@ -1,4 +1,10 @@
 name: Vercel Repository Dispatch Events
+
+permissions:
+  statuses: write
+  deployments: read
+  contents: read
+
 on:
   deployment_status:
     types:
