@@ -40,6 +40,7 @@ jobs:
       - name: 'notify vercel'
         uses: 'vercel/repository-dispatch/actions/status@v1'
         with:
+          name: 'Vercel  - ${{ github.event.client_payload.state.type }} - Deployment'
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{github.event.client_payload.projectId}}
