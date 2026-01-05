@@ -36,9 +36,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const sha = context.payload.client_payload.sha;
+            const sha = context.payload.client_payload.git.sha ;
             const environment = context.payload.client_payload.environment;
             const targetUrl = context.payload.client_payload.target_url;
+            
+            if (!sha) {
+              console.log('❌ No SHA found in payload');
+              console.log('Payload:', JSON.stringify(context.payload.client_payload, null, 2));
+              return;
+            }
             
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
@@ -57,9 +63,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const sha = context.payload.client_payload.sha;
+            const sha = context.payload.client_payload.git.sha ;
             const environment = context.payload.client_payload.environment;
             const targetUrl = context.payload.client_payload.target_url;
+            
+            if (!sha) {
+              console.log('❌ No SHA found in payload');
+              console.log('Payload:', JSON.stringify(context.payload.client_payload, null, 2));
+              return;
+            }
             
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
@@ -80,6 +92,7 @@ jobs:
         run: |
           echo "Event: ${{ github.event_name }}"
           echo "Deployment ID: ${{ github.event.deployment.id }}"
+          echo "SHA: ${{ github.event.deployment.sha }}"
           echo "State: ${{ github.event.deployment_status.state }}"
           echo "Description: ${{ github.event.deployment_status.description }}"
           echo "Environment: ${{ github.event.deployment.environment }}"
@@ -93,6 +106,12 @@ jobs:
             const sha = context.payload.deployment.sha;
             const environment = context.payload.deployment.environment;
             const targetUrl = context.payload.deployment_status.target_url;
+            
+            if (!sha) {
+              console.log('❌ No SHA found in deployment');
+              console.log('Deployment:', JSON.stringify(context.payload.deployment, null, 2));
+              return;
+            }
             
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
@@ -114,6 +133,12 @@ jobs:
             const sha = context.payload.deployment.sha;
             const environment = context.payload.deployment.environment;
             const targetUrl = context.payload.deployment_status.target_url;
+            
+            if (!sha) {
+              console.log('❌ No SHA found in deployment');
+              console.log('Deployment:', JSON.stringify(context.payload.deployment, null, 2));
+              return;
+            }
             
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
