@@ -31,6 +31,47 @@ jobs:
           echo "Event: ${{ github.event_name }}"
           echo "Action: ${{ github.event.action }}"
           echo "Client Payload: ${{ toJson(github.event.client_payload) }}"
+      - name: Create commit status for successful deployment
+        if: github.event.deployment_status.state == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.payload.deployment.sha;
+            const environment = context.payload.deployment.environment;
+            const targetUrl = context.payload.deployment_status.target_url;
+            
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha,
+              state: 'success',
+              target_url: targetUrl,
+              description: `Deployment to ${environment} succeeded`,
+              context: `vercel/${environment}`
+            });
+            
+            console.log(`✅ Created success commit status for SHA ${sha}`);
+      
+      - name: Create commit status for failed deployment
+        if: github.event.deployment_status.state == 'failure' || github.event.deployment_status.state == 'error'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.payload.deployment.sha;
+            const environment = context.payload.deployment.environment;
+            const targetUrl = context.payload.deployment_status.target_url;
+            
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha,
+              state: 'failure',
+              target_url: targetUrl,
+              description: `Deployment to ${environment} failed`,
+              context: `vercel/${environment}`
+            });
+            
+            console.log(`❌ Created failure commit status for SHA ${sha}`);
   deploymentStatusEvent:
     if: github.event_name == 'deployment_status'
     runs-on: ubuntu-latest
