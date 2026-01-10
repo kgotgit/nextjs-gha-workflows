@@ -22,7 +22,7 @@ jobs:
       - name: 'notify vercel'
         uses: 'vercel/repository-dispatch/actions/status@v1'
         with:
-          name: '${{context.payload.client_payload.project.name}}: Lint'
+          name: '${{ github.event.client_payload.project.name }}: Lint'
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{github.event.client_payload.projectId}}
