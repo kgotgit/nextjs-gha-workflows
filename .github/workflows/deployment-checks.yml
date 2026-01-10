@@ -22,7 +22,7 @@ jobs:
       - name: 'notify vercel'
         uses: 'vercel/repository-dispatch/actions/status@v1'
         with:
-          name: 'Vercel  - ${{ github.event.client_payload.project.name }}: Deployment'
+          name: '${context.payload.client_payload.project.name}: Lint'
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{github.event.client_payload.projectId}}
@@ -33,15 +33,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const status = context.payload.client_payload.state.type;
             const sha = context.payload.client_payload.git.sha ;
             const environment = context.payload.client_payload.environment;
             const targetUrl = context.payload.client_payload.target_url;
             
-            if (!sha) {
-              console.log('❌ No SHA found in payload');
-              console.log('Payload:', JSON.stringify(context.payload.client_payload, null, 2));
-              return;
-            }
+           
             
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
