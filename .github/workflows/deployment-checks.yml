@@ -8,11 +8,24 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    if: github.event.client_payload.state.type == 'success'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.deployment_status.deployment.ref }}
+          ref: ${{ context.payload.client_payload.git.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Run linter
+        run: pnpm lint
 
       - name: Report status to Vercel
         uses: actions/github-script@v7
@@ -20,14 +33,27 @@ jobs:
         with:
           script: |
             const status = '${{ job.status }}' === 'success' ? 'success' : 'failure';
+            const sha = context.payload.client_payload.git.sha ;
+            const environment = context.payload.client_payload.environment;
+            const targetUrl = context.payload.client_payload.target_url;
+            
+            if (!sha) {
+              console.log('❌ No SHA found in payload');
+              console.log('Payload:', JSON.stringify(context.payload.client_payload, null, 2));
+              return;
+            }
+            
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
+              sha: sha,
               sha: '${{ github.event.deployment_status.deployment.sha }}',
               state: status,
               context: 'Lint',
               description: status === 'success' ? 'Linting passed' : 'Linting failed',
               target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });
+            
+            console.log(`✅ Created success commit status for SHA ${sha}`);
 
   
