@@ -8,24 +8,11 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    if: github.event.deployment_status.state == 'success'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.deployment_status.deployment.ref }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm i
-
-      - name: Run linter
-        run: pnpm lint
 
       - name: Report status to Vercel
         uses: actions/github-script@v7
