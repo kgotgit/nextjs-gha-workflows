@@ -22,7 +22,7 @@ jobs:
       - name: 'notify vercel'
         uses: 'vercel/repository-dispatch/actions/status@v1'
         with:
-          name: '${{ github.event.client_payload.project.name }}: Lint'
+          name: 'Vercel - ${{ github.event.client_payload.project.name }}: lint'
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{github.event.client_payload.projectId}}
@@ -42,7 +42,7 @@ jobs:
               repo: context.repo.repo,
               sha: sha,
               state: 'success',
-              context: `${context.payload.client_payload.project.name}: Lint`,
+              context: `Vercel - ${context.payload.client_payload.project.name}: lint`,
               description: status === 'success' ? 'Linting passed' : 'Linting failed',
               target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
            
